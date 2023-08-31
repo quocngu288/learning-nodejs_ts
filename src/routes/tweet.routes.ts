@@ -2,7 +2,7 @@ import express from 'express'
 
 export const tweetRouter = express.Router()
 
-tweetRouter.get('', (req, res) => {
+tweetRouter.get('/', (req, res) => {
     res.json({
         data: [
             {
@@ -12,5 +12,3 @@ tweetRouter.get('', (req, res) => {
         ]
     })
 })
-
-tweetRouter.use('/tweet', tweetRouter)

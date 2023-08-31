@@ -4,7 +4,5 @@ import { userRouter } from './users.routes'
 
 export const mainRouter = express.Router()
 
-mainRouter.use('', [
-    tweetRouter,
-    userRouter
-])
+mainRouter.use('/tweet', tweetRouter)
+mainRouter.use('/users', userRouter)
