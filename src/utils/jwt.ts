@@ -1,11 +1,20 @@
 import jwt, { SignOptions } from "jsonwebtoken";
+import { config } from 'dotenv'
+import { ErrorWithStatus } from "~/models/Errors";
+import { httpStatus } from "~/constants/httpStatus";
 
+config()
 
 //note: trường họp params nhiều có thể nghĩ đến việc xử dụng object
 interface ParamsSignToken {
     payload: string | Buffer | object
     privateKey?: string
     options?: SignOptions
+}
+
+interface ParamsVerifyToken {
+    token: string
+    secretOrPublicKey?: string
 }
 
 
@@ -16,6 +25,17 @@ export const signToken = ({payload, privateKey = process.env.JWT_SECRET as strin
               throw reject(error)
             }
             return resolve(token as string)
+        })
+    })
+}
+
+export const verifyToken = ({token, secretOrPublicKey = process.env.JWT_SECRET as string}: ParamsVerifyToken) => {
+    return new Promise<jwt.JwtPayload>((resolve, reject) => {
+        jwt.verify(token, secretOrPublicKey, (error, decode) => {
+            if(error) {
+                throw reject(new ErrorWithStatus({message: "Refesh token ko đúng định dạng", status: httpStatus.UNAUTHORIZED}))
+            }
+            resolve(decode as jwt.JwtPayload)
         })
     })
 }

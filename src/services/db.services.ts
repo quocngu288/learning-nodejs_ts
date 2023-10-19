@@ -1,8 +1,11 @@
 
 import { Collection, Db, MongoClient } from 'mongodb'
 import { config } from 'dotenv'
-import User from '~/models/schemas/users.schemas';
+import UserSchema from '~/models/schemas/users.schemas';
+import RefreshTokenSchema from '~/models/schemas/refreshToken.schemas';
+
 config()
+
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@clusternick.qrlzcbl.mongodb.net/?retryWrites=true&w=majority`;
 
 class DatabaseService {
@@ -22,8 +25,12 @@ class DatabaseService {
         }
       }
 
-      get users(): Collection<User> {
+      get users(): Collection<UserSchema> {
         return this.db.collection(process.env.DB_COLLECTION_USERS as string)
+      }
+
+      get refreshTokens(): Collection<RefreshTokenSchema> {
+        return this.db.collection(process.env.DB_COLLECTION_REFRESH_TOKENS as string)
       }
 }
 

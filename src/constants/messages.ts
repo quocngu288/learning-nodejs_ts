@@ -17,5 +17,8 @@ export const userMessages = {
     CONFIRM_PASSWORD_LENGTH_6_TO_50: "Passord confirm length from 6 to 50 characters",
     CONFIRM_PASSWORD_NOT_MATCH: "Password confirm not match",
     //date of birth
-    DATE_OF_BIRTH_IS_ISO2801: "Date of birth must be ISO28001"
+    DATE_OF_BIRTH_IS_ISO2801: "Date of birth must be ISO28001",
+    // access_token
+    ACCESS_TOKEN_REQUIRED: "Access tokent is required",
+    REFRESH_TOKEN_REQUIRED: "Refresh tokent is required"
 }
