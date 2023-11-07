@@ -30,8 +30,12 @@ export const registerController = async (req: Request<ParamsDictionary, any, Use
 }
 
 export const logoutController = async(req: Request, res: Response) => {
-        const {refresh_token} = req.body
-        const result = await userService.logout(refresh_token)
-        return res.json(result)
+    const {refresh_token} = req.body
+    const result = await userService.logout(refresh_token)
+    return res.json(result)
+
+}
+
+export const emailVerifyController = async (req: Request, res: Response) => {
 
 }

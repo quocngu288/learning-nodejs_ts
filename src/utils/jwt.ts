@@ -8,17 +8,17 @@ config()
 //note: trường họp params nhiều có thể nghĩ đến việc xử dụng object
 interface ParamsSignToken {
     payload: string | Buffer | object
-    privateKey?: string
+    privateKey: string
     options?: SignOptions
 }
 
 interface ParamsVerifyToken {
     token: string
-    secretOrPublicKey?: string
+    secretOrPublicKey: string
 }
 
 
-export const signToken = ({payload, privateKey = process.env.JWT_SECRET as string, options = {algorithm: 'HS256'}}: ParamsSignToken) => {
+export const signToken = ({payload, privateKey, options = {algorithm: 'HS256'}}: ParamsSignToken) => {
     return new Promise<string>((resolve,reject) => {
         jwt.sign(payload, privateKey, options, (error, token) => {
             if(error) {
@@ -29,7 +29,7 @@ export const signToken = ({payload, privateKey = process.env.JWT_SECRET as strin
     })
 }
 
-export const verifyToken = ({token, secretOrPublicKey = process.env.JWT_SECRET as string}: ParamsVerifyToken) => {
+export const verifyToken = ({token, secretOrPublicKey}: ParamsVerifyToken) => {
     return new Promise<jwt.JwtPayload>((resolve, reject) => {
         jwt.verify(token, secretOrPublicKey, (error, decode) => {
             if(error) {

@@ -20,5 +20,6 @@ export const userMessages = {
     DATE_OF_BIRTH_IS_ISO2801: "Date of birth must be ISO28001",
     // access_token
     ACCESS_TOKEN_REQUIRED: "Access tokent is required",
-    REFRESH_TOKEN_REQUIRED: "Refresh tokent is required"
+    REFRESH_TOKEN_REQUIRED: "Refresh tokent is required",
+    EMAIL_VERIFY_TOKEN_REQUIRED: "Email Verify token is required"
 }

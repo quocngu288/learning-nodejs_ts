@@ -11,11 +11,17 @@ import { config } from 'dotenv'
 config()
 class UserService {
     private signAccessToken = (user_id:string) => {
-        return signToken({payload: {user_id, token_type: TokenType.AccessToken}, options: {expiresIn: '15m'}})
+        return signToken({
+            payload: {user_id, token_type: TokenType.AccessToken},
+            privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string,
+            options: {expiresIn: '15m'}})
     }
 
     private signRefreshToken = (user_id:string) => {
-        return signToken({payload: {user_id, token_type: TokenType.RefreshToken}, options: {expiresIn: '100d'}})
+        return signToken({
+            payload: {user_id, token_type: TokenType.RefreshToken},
+            privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
+            options: {expiresIn: '100d'}})
     }
 
     private signAccessAndRefreshToken = (user_id: string) => {
