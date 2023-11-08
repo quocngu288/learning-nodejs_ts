@@ -1,9 +1,11 @@
 import { Response, Request, NextFunction } from "express";
 import userService from "~/services/users.services";
 import {ParamsDictionary} from 'express-serve-static-core'
-import { UserRequestBody } from "~/models/requests/User.request";
+import { TokenPayload, UserRequestBody } from "~/models/requests/User.request";
 import UserSchema from "~/models/schemas/users.schemas";
 import { ObjectId } from "mongodb";
+import databaseService from "~/services/db.services";
+import { httpStatus } from "~/constants/httpStatus";
 
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
@@ -37,5 +39,14 @@ export const logoutController = async(req: Request, res: Response) => {
 }
 
 export const emailVerifyController = async (req: Request, res: Response) => {
+    const {user_id} = req.decode_email_verify_token as TokenPayload
+    const user = await databaseService.users.findOne({_id: new ObjectId(user_id)})
 
+    // nếu ko tìm thấy user => show error
+
+    if(!user){
+        return res.status(httpStatus.NOT_FOUND).json({
+            message: "không tìm thất user"
+        })
+    }
 }

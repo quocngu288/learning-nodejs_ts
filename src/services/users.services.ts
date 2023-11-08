@@ -70,6 +70,17 @@ class UserService {
             message: "Logout success"
         }
     }
+
+    async verifyEmail(user_id: string) {
+        await databaseService.users.updateOne(
+            {_id: new ObjectId(user_id)},
+            {
+                $set:{
+                    email_verify_token: '',
+                    updated_at: new Date()
+                }
+            })
+    }
 } 
 const userService = new UserService()
 

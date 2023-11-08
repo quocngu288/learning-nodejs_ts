@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { checkSchema } from "express-validator";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { httpStatus } from "~/constants/httpStatus";
@@ -157,7 +158,7 @@ export const refreshTokenValidator = validate(checkSchema({
                     ])
                     console.log("refresh_token",refresh_token);
                     if(refresh_token === null) {
-                        throw new ErrorWithStatus({message: "Refresh token ko tồn tại", status: 401})
+                        throw new ErrorWithStatus({message: "Refresh token ko tồn tại hoặc đã sử dụng", status: 401})
                     }                    
                     // return req về cho controller xử lý
                     req.decode_refresh_token =decode_refresh_token
@@ -165,7 +166,7 @@ export const refreshTokenValidator = validate(checkSchema({
                 } catch (error) {
                     if(error instanceof JsonWebTokenError) {
                         throw new ErrorWithStatus({
-                            message: "Refresh token không đúng",
+                            message: "Refresh token không đúng", //error.message
                             status: httpStatus.UNAUTHORIZED
                         })
                     }
@@ -192,7 +193,7 @@ export const emailVerifyTokenValidator = validate(checkSchema({
                 }
                 const decode_email_verify_token = await verifyToken({token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string})                 
                 // return req về cho controller xử lý
-                 req.decode_email_verify_token = decode_email_verify_token
+                 ;(req as Request).decode_email_verify_token = decode_email_verify_token
 
                 return true
             }

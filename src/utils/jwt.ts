@@ -2,6 +2,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { config } from 'dotenv'
 import { ErrorWithStatus } from "~/models/Errors";
 import { httpStatus } from "~/constants/httpStatus";
+import { TokenPayload } from "~/models/requests/User.request";
 
 config()
 
@@ -30,12 +31,12 @@ export const signToken = ({payload, privateKey, options = {algorithm: 'HS256'}}:
 }
 
 export const verifyToken = ({token, secretOrPublicKey}: ParamsVerifyToken) => {
-    return new Promise<jwt.JwtPayload>((resolve, reject) => {
+    return new Promise<TokenPayload>((resolve, reject) => {
         jwt.verify(token, secretOrPublicKey, (error, decode) => {
             if(error) {
                 throw reject(new ErrorWithStatus({message: "Refesh token ko đúng định dạng", status: httpStatus.UNAUTHORIZED}))
             }
-            resolve(decode as jwt.JwtPayload)
+            resolve(decode as TokenPayload)
         })
     })
 }
