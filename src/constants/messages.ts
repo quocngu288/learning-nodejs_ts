@@ -21,5 +21,9 @@ export const userMessages = {
     // access_token
     ACCESS_TOKEN_REQUIRED: "Access tokent is required",
     REFRESH_TOKEN_REQUIRED: "Refresh tokent is required",
-    EMAIL_VERIFY_TOKEN_REQUIRED: "Email Verify token is required"
+    EMAIL_VERIFY_TOKEN_REQUIRED: "Email Verify token is required",
+
+    // not found
+    USER_NOT_FOUND: 'User not found',
+    EMAIL_VERIFIED_BEFORE: 'Email already verified before'
 }

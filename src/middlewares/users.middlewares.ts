@@ -191,7 +191,7 @@ export const emailVerifyTokenValidator = validate(checkSchema({
                         status: httpStatus.UNAUTHORIZED
                     })
                 }
-                const decode_email_verify_token = await verifyToken({token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string})                 
+                const decode_email_verify_token = await verifyToken({token: value, secretOrPublicKey: process.env.JWT_SECRET_VERIFY_EMAIL as string})                 
                 // return req về cho controller xử lý
                  ;(req as Request).decode_email_verify_token = decode_email_verify_token
 

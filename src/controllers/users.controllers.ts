@@ -6,6 +6,8 @@ import UserSchema from "~/models/schemas/users.schemas";
 import { ObjectId } from "mongodb";
 import databaseService from "~/services/db.services";
 import { httpStatus } from "~/constants/httpStatus";
+import { userMessages } from "~/constants/messages";
+import { UserVerifyStatus } from "~/constants/enum";
 
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
@@ -46,7 +48,38 @@ export const emailVerifyController = async (req: Request, res: Response) => {
 
     if(!user){
         return res.status(httpStatus.NOT_FOUND).json({
-            message: "không tìm thất user"
+            message: userMessages.USER_NOT_FOUND
         })
     }
+    if(user.email_verify_token === '') {
+        return res.status(httpStatus.OK).json({
+            message: userMessages.EMAIL_VERIFIED_BEFORE
+        })
+    }
+    const rs = await userService.verifyEmail(user_id)
+    return res.json({
+        message: 'Verify success',
+        rs
+    })
+}
+export const resendEmailVerifyController = async (req: Request, res: Response) => {
+    const {user_id} = req.decode_authorization as TokenPayload
+    const user = await databaseService.users.findOne({_id: new ObjectId(user_id)})
+
+    // nếu ko tìm thấy user => show error
+
+    if(!user){
+        return res.status(httpStatus.NOT_FOUND).json({
+            message: userMessages.USER_NOT_FOUND
+        })
+    }
+    if(user.verify === UserVerifyStatus.Verified) {
+        return res.status(httpStatus.OK).json({
+            message: userMessages.EMAIL_VERIFIED_BEFORE
+        })
+    }
+    const rs = await userService.resendVerifyEmail(user_id)
+    return res.json(
+        rs
+    )
 }
