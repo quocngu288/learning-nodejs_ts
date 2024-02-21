@@ -38,6 +38,13 @@ class UserService {
             options: {expiresIn: '7d'}})
     }
 
+    private signForgotPasswordToken = (user_id:string) => {
+        return signToken({
+            payload: {user_id, token_type: TokenType.ForgotPasswordToken},
+            privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD as string,
+            options: {expiresIn: '7d'}})
+    }
+
     async register(payload: UserRequestBody) {
         const user_id = new ObjectId()
         const email_verify_token = await this.signEmailVerifyToken(user_id.toString())
@@ -114,6 +121,20 @@ class UserService {
         await databaseService.users.updateOne({_id: new ObjectId(user_id)}, {$set: {email_verify_token}, $currentDate: {updated_at: true}})
         return {
             message: "Resend Verified Success",
+        }
+    }
+
+    async forgotPassword (user_id: string) {
+        const forgot_password_token = await this.signForgotPasswordToken(user_id)
+
+        
+        await databaseService.users.updateOne({_id: new ObjectId(user_id)},{$set: {
+            forgot_password_token
+        }, $currentDate:{updated_at: true}})
+        // => gửi email kèm đường link về user
+        console.log('forgot_password_token', forgot_password_token);
+        return {
+            message: "Check email to reset password",
         }
     }
 } 

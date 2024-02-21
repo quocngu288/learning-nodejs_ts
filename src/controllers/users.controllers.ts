@@ -83,3 +83,8 @@ export const resendEmailVerifyController = async (req: Request, res: Response) =
         rs
     )
 }
+
+export const forgotPasswordController = async (req: Request, res: Response) => {
+    const {_id} = req.user as UserSchema
+    const rs = userService.forgotPassword(_id)
+}
