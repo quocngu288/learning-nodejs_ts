@@ -145,6 +145,8 @@ export const accessTokenValidator = validate(
         custom: {
           options: async (value, { req }) => {
             const access_token = value.split(' ')[1]
+            console.log('access_token', access_token);
+            
             if (access_token === '') {
               throw new ErrorWithStatus({
                 message: userMessages.ACCESS_TOKEN_REQUIRED,
@@ -155,6 +157,8 @@ export const accessTokenValidator = validate(
               token: access_token,
               secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
             })
+            console.log('decode_authorization', decode_authorization);
+            
             req.decode_authorization = decode_authorization
             return true
           }
@@ -377,8 +381,87 @@ export const resetPasswordValidator = validate(
   )
 )
 
+export const updateMeValidator = validate(checkSchema({
+  name: {
+    notEmpty: {
+      errorMessage: userMessages.NAME_REQUIRED
+    },
+    optional: true,
+    trim: true,
+    isLength: {
+      options: {
+        min: 3,
+        max: 100
+      },
+      errorMessage: userMessages.NAME_LENGTH_3_TO_100
+    }
+  },
+  date_of_birth: {
+    isString: true,
+    optional: true,
+    isISO8601: {
+      options: {
+        strict: true,
+        strictSeparator: true
+      },
+      errorMessage: userMessages.DATE_OF_BIRTH_IS_ISO2801
+    }
+  },
+  bio: {
+    isString: {
+      errorMessage: userMessages.BIO_MUST_BE_STRING
+    },
+    optional: true,
+    trim: true
+  },
+  location: {
+    isString: {
+      errorMessage: userMessages.LOCATION_MUST_BE_STRING
+    },
+    optional: true,
+    trim: true
+  },
+  website: {
+    isString: {
+      errorMessage: userMessages.WEBSITE_MUST_BE_STRING
+    },
+    optional: true,
+    trim: true
+  },
+  username: {
+    isString: {
+      errorMessage: userMessages.USERNAME_MUST_BE_STRING
+    },
+    isLength: {
+      options: {
+        min: 1,
+        max: 40
+      },
+      errorMessage: userMessages.USERNAME_LIMIT_LENGHT
+    },
+    optional: true,
+    trim: true
+  },
+  avatar: {
+    isString: {
+      errorMessage: userMessages.IMG_URL_MUST_BE_STRING
+    },
+    optional: true,
+    trim: true
+  },
+  cover_photo: {
+    isString: {
+      errorMessage: userMessages.IMG_URL_MUST_BE_STRING
+    },
+    optional: true,
+    trim: true
+  }
+}))
+
 export const verifyUserValidator = (req: Request, res: Response, next: NextFunction) => {
   const { verify } = req.decode_authorization as TokenPayload
+  console.log('verify',verify);
+  
   if (verify !== UserVerifyStatus.Verified) {
     throw new ErrorWithStatus({ message: 'User not verify', status: httpStatus.FORBIDDEN })
   }

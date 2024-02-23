@@ -1,18 +1,21 @@
 import UserSchema from '~/models/schemas/users.schemas'
 import databaseService from './db.services'
-import { UserRequestBody } from '~/models/requests/User.request'
+import { UpdateMeRequestBody, UserRequestBody } from '~/models/requests/User.request'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import RefreshTokenSchema from '~/models/schemas/refreshToken.schemas'
 import { ObjectId } from 'mongodb'
 import { config } from 'dotenv'
+import { ErrorWithStatus } from '~/models/Errors'
+import { userMessages } from '~/constants/messages'
+import { httpStatus } from '~/constants/httpStatus'
 
 config()
 class UserService {
   private signAccessToken = ({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) => {
     return signToken({
-      payload: { user_id, token_type: TokenType.AccessToken },
+      payload: { user_id, token_type: TokenType.AccessToken, verify },
       privateKey: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: { expiresIn: '15m' }
     })
@@ -20,7 +23,7 @@ class UserService {
 
   private signRefreshToken = ({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) => {
     return signToken({
-      payload: { user_id, token_type: TokenType.RefreshToken },
+      payload: { user_id, token_type: TokenType.RefreshToken, verify },
       privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
       options: { expiresIn: '100d' }
     })
@@ -32,7 +35,7 @@ class UserService {
 
   private signEmailVerifyToken = ({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) => {
     return signToken({
-      payload: { user_id, token_type: TokenType.EmailVerifyToken },
+      payload: { user_id, token_type: TokenType.EmailVerifyToken, verify },
       privateKey: process.env.JWT_SECRET_VERIFY_EMAIL as string,
       options: { expiresIn: '7d' }
     })
@@ -40,7 +43,7 @@ class UserService {
 
   private signForgotPasswordToken = ({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) => {
     return signToken({
-      payload: { user_id, token_type: TokenType.ForgotPasswordToken },
+      payload: { user_id, token_type: TokenType.ForgotPasswordToken, verify },
       privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD as string,
       options: { expiresIn: '7d' }
     })
@@ -55,6 +58,7 @@ class UserService {
     await databaseService.users.insertOne(
       new UserSchema({
         ...payload,
+        username: `username-${user_id}`,
         _id: user_id,
         email_verify_token,
         date_of_birth: new Date(payload.date_of_birth),
@@ -185,6 +189,49 @@ class UserService {
         }
       }
     )
+    return user
+  }
+
+  async updateMe(user_id: string, body: UpdateMeRequestBody) {
+    const _payload = body.date_of_birth ? {...body, date_of_birth: new Date(body.date_of_birth)} : {...body}
+    const dataUpdateUser = await databaseService.users.findOneAndUpdate(
+      {_id: new ObjectId(user_id)},
+      {$set: {
+        ...(_payload as UpdateMeRequestBody & {date_of_birth?: Date}),
+      },
+      $currentDate: {
+        updated_at: true
+      }
+    },
+    {
+      returnDocument: 'after',
+      projection: {
+        password: 0,
+        email_verify_token: 0,
+        forgot_password_token: 0
+      }
+    }
+      )
+      console.log("dataUpdateUser", dataUpdateUser);
+      
+    return dataUpdateUser.value
+  }
+
+  async getProfile(username: string) {
+    const user = await databaseService.users.findOne({username}, {projection: {
+      password: 0,
+      email_verify_token: 0,
+      forgot_password_token: 0,
+      verify: 0,
+      created_at: 0,
+      updated_at: 0
+    }})
+    if(!user) {
+      throw new ErrorWithStatus({
+        message: userMessages.USER_NOT_FOUND,
+         status: httpStatus.NOT_FOUND
+      })
+    }
     return user
   }
 }

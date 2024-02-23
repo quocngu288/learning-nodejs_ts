@@ -27,5 +27,14 @@ export const userMessages = {
   USER_NOT_FOUND: 'User not found',
   EMAIL_VERIFIED_BEFORE: 'Email already verified before',
 
-  FORGOT_PASSWORD_TOKEN_REQUIRED: 'Refresh tokent is required'
+  FORGOT_PASSWORD_TOKEN_REQUIRED: 'Refresh tokent is required',
+
+  NAME_MUST_BE_STRING: "Name must be a string",
+  USERNAME_MUST_BE_STRING: "Name must be a string",
+  USERNAME_LIMIT_LENGHT: 'Username limit from 1 to 40 charactor',
+  BIO_MUST_BE_STRING: "Bio must be a string",
+  LOCATION_MUST_BE_STRING: "Location must be a string",
+  WEBSITE_MUST_BE_STRING: "Website must be a string",
+
+  IMG_URL_MUST_BE_STRING: " Image Url must be a string"
 }
