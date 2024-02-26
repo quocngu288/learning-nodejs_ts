@@ -10,6 +10,7 @@ import { config } from 'dotenv'
 import { ErrorWithStatus } from '~/models/Errors'
 import { userMessages } from '~/constants/messages'
 import { httpStatus } from '~/constants/httpStatus'
+import FollowSchema from '~/models/schemas/follow.schemas'
 
 config()
 class UserService {
@@ -193,46 +194,97 @@ class UserService {
   }
 
   async updateMe(user_id: string, body: UpdateMeRequestBody) {
-    const _payload = body.date_of_birth ? {...body, date_of_birth: new Date(body.date_of_birth)} : {...body}
+    const _payload = body.date_of_birth ? { ...body, date_of_birth: new Date(body.date_of_birth) } : { ...body }
     const dataUpdateUser = await databaseService.users.findOneAndUpdate(
-      {_id: new ObjectId(user_id)},
-      {$set: {
-        ...(_payload as UpdateMeRequestBody & {date_of_birth?: Date}),
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          ...(_payload as UpdateMeRequestBody & { date_of_birth?: Date })
+        },
+        $currentDate: {
+          updated_at: true
+        }
       },
-      $currentDate: {
-        updated_at: true
+      {
+        returnDocument: 'after',
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
       }
-    },
-    {
-      returnDocument: 'after',
-      projection: {
-        password: 0,
-        email_verify_token: 0,
-        forgot_password_token: 0
-      }
-    }
-      )
-      console.log("dataUpdateUser", dataUpdateUser);
-      
+    )
+    console.log('dataUpdateUser', dataUpdateUser)
+
     return dataUpdateUser.value
   }
 
   async getProfile(username: string) {
-    const user = await databaseService.users.findOne({username}, {projection: {
-      password: 0,
-      email_verify_token: 0,
-      forgot_password_token: 0,
-      verify: 0,
-      created_at: 0,
-      updated_at: 0
-    }})
-    if(!user) {
+    const user = await databaseService.users.findOne(
+      { username },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify: 0,
+          created_at: 0,
+          updated_at: 0
+        }
+      }
+    )
+    if (!user) {
       throw new ErrorWithStatus({
         message: userMessages.USER_NOT_FOUND,
-         status: httpStatus.NOT_FOUND
+        status: httpStatus.NOT_FOUND
       })
     }
     return user
+  }
+
+  async follow(user_id: string, followed_user_id: string) {
+    const follower = await databaseService.follows.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    console.log('follow', follower)
+
+    if (follower) {
+      return {
+        message: 'User is followed before'
+      }
+    }
+    const follow = await databaseService.follows.insertOne(
+      new FollowSchema({
+        user_id: new ObjectId(user_id),
+        followed_user_id: new ObjectId(followed_user_id)
+      })
+    )
+    console.log('follow', follow)
+    return {
+      message: 'Follow user successfull'
+    }
+  }
+
+  async unFollow(user_id: string, followed_user_id: string) {
+    const follower = await databaseService.follows.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    if (follower) {
+      await databaseService.follows.deleteOne(
+        new FollowSchema({
+          user_id: new ObjectId(user_id),
+          followed_user_id: new ObjectId(followed_user_id)
+        })
+      )
+      return {
+        message: 'Unfollow user successfull'
+      }
+    }
+    return {
+      message: 'User is not followed before'
+    }
   }
 }
 const userService = new UserService()

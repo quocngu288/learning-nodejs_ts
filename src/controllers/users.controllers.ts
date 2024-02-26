@@ -113,7 +113,7 @@ export const getMeController = async (req: Request, res: Response) => {
 }
 
 export const updateMeController = async (req: Request, res: Response) => {
-  const {user_id} = req.decode_authorization as TokenPayload
+  const { user_id } = req.decode_authorization as TokenPayload
   const rs = await userService.updateMe(user_id, req.body)
   return res.json({
     message: 'Verify Success',
@@ -121,10 +121,24 @@ export const updateMeController = async (req: Request, res: Response) => {
   })
 }
 export const getProfile = async (req: Request, res: Response) => {
-  const {username} = req.params
+  const { username } = req.params
   const rs = await userService.getProfile(username)
   return res.json({
     message: 'Get Profile Successfull',
     rs
   })
+}
+
+export const followUserController = async (req: Request, res: Response) => {
+  const { user_id } = req.decode_authorization as TokenPayload
+  const { followed_user_id } = req.body
+  const rs = await userService.follow(user_id, followed_user_id)
+  return res.json(rs)
+}
+
+export const unFollowController = async (req: Request, res: Response) => {
+  const { follow_user_id } = req.params
+  const { user_id } = req.decode_authorization as TokenPayload
+  const rs = await userService.unFollow(user_id, follow_user_id)
+  return res.json(rs)
 }
