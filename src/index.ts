@@ -19,9 +19,12 @@ import bodyParser from 'body-parser'
 import databaseService from './services/db.services'
 import { mainRouter } from './routes/index.routes'
 import { defaultErrorHandler } from './middlewares/error.middleware'
+import { initFolderUploads } from './utils/file'
 const app = express()
 
 config()
+
+initFolderUploads()
 
 databaseService.connect()
 
