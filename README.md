@@ -1,11 +1,14 @@
-# learning-node
-PORT=7000
+PORT=8000
 DB_USERNAME=quocngu
 DB_PASSWORD=Quocngu123
 
 DB_COLLECTION_USERS=users
 DB_COLLECTION_REFRESH_TOKENS=refresh_tokens
+DB_COLLECTION_FOLLOWS= follows
 
 JWT_SECRET_ACCESS_TOKEN=jwt_access_token
 JWT_SECRET_REFRESH_TOKEN=jwt_refresh_token
-JWT_SECRET_VERIFY_EMAIL=jwt_verify_email 
+JWT_SECRET_VERIFY_EMAIL=jwt_verify_email
+JWT_SECRET_FORGOT_PASSWORD=jwt_verify_email
+
+HOST=https://nodesuper.com

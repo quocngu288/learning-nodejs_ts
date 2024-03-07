@@ -20,6 +20,8 @@ import databaseService from './services/db.services'
 import { mainRouter } from './routes/index.routes'
 import { defaultErrorHandler } from './middlewares/error.middleware'
 import { initFolderUploads } from './utils/file'
+import path from 'path'
+
 const app = express()
 
 config()
@@ -29,12 +31,14 @@ initFolderUploads()
 databaseService.connect()
 
 // support parsing of application/json type post data
-app.use(bodyParser.json());
+app.use(bodyParser.json())
 
 //support parsing of application/x-www-form-urlencoded post data
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/api', mainRouter)
+
+// app.use('/uploads', express.static(path.resolve('uploads')))
 
 // xử lý "error handler"
 app.use(defaultErrorHandler)
