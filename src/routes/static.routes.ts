@@ -1,6 +1,7 @@
 import express from 'express'
-import { servingImageStaticContoller } from '~/controllers/medias.controllers'
+import { servingImageStaticContoller, servingVideosContoller } from '~/controllers/medias.controllers'
 
 export const staticRouter = express.Router()
 
-staticRouter.get('/uploads/:name', servingImageStaticContoller)
+staticRouter.get('/uploads/images/:name', servingImageStaticContoller)
+staticRouter.get('/uploads/videos/:name', servingVideosContoller)
