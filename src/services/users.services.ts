@@ -22,7 +22,13 @@ class UserService {
     })
   }
 
-  private signRefreshToken = ({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) => {
+  private signRefreshToken = ({ user_id, verify, exp }: { user_id: string; verify: UserVerifyStatus, exp?: number }) => {
+    if(exp) {
+      return signToken({
+        payload: { user_id, token_type: TokenType.RefreshToken, verify, exp },
+        privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
+      })
+    }
     return signToken({
       payload: { user_id, token_type: TokenType.RefreshToken, verify },
       privateKey: process.env.JWT_SECRET_REFRESH_TOKEN as string,
@@ -110,6 +116,22 @@ class UserService {
     await databaseService.refreshTokens.deleteOne({ token: refresh_token })
     return {
       message: 'Logout success'
+    }
+  }
+
+  async refreshToken({user_id, token,verify, exp}: {user_id: string, verify: UserVerifyStatus, token: string, exp?: number}) {
+    const [access_token, refresh_token] = await Promise.all([
+      this.signAccessToken({user_id,verify}),
+      this.signRefreshToken({user_id, verify, exp})
+    ])
+
+    await databaseService.refreshTokens.deleteOne({token})
+    await databaseService.refreshTokens.insertOne(
+      new RefreshTokenSchema({ token: refresh_token, user_id: new ObjectId(user_id) })
+    )
+    return {
+      access_token,
+      refresh_token
     }
   }
 

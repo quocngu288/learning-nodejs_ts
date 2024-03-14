@@ -7,6 +7,7 @@ import {
   getProfile,
   loginController,
   logoutController,
+  refreshTokenController,
   registerController,
   resendEmailVerifyController,
   resetPasswordValidatorController,
@@ -37,6 +38,7 @@ export const userRouter = express.Router()
 userRouter.post('/login', checkValidateLogin, wrapAsync(loginController))
 userRouter.post('/register', checkValidateRegistor, wrapAsync(registerController))
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapAsync(logoutController))
+userRouter.post('/refresh-token', refreshTokenValidator, wrapAsync(refreshTokenController))
 userRouter.post('/verify-email', emailVerifyTokenValidator, wrapAsync(emailVerifyController))
 userRouter.post('/resend-verify-email', accessTokenValidator, wrapAsync(resendEmailVerifyController))
 

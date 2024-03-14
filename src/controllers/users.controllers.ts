@@ -42,6 +42,16 @@ export const logoutController = async (req: Request, res: Response) => {
   return res.json(result)
 }
 
+export const refreshTokenController = async (req: Request, res: Response) => {
+  const {user_id, verify, exp} = req.decode_refresh_token as TokenPayload
+  const {refresh_token} = req.body
+  const rs = await userService.refreshToken({user_id, token: refresh_token,verify, exp })
+  return res.json({
+    message: 'ss',
+    rs
+  })
+}
+
 export const emailVerifyController = async (req: Request, res: Response) => {
   const { user_id } = req.decode_email_verify_token as TokenPayload
   const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
